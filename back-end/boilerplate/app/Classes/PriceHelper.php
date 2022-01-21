@@ -25,7 +25,36 @@ class PriceHelper
      */
     public static function getUnitPriceTierAtQty(int $qty, array $tiers): float
     {
-        return 0.0;
+        // echo("Before ");
+        // print_r($tiers);
+        // echo ("\n");
+
+        krsort($tiers); //sort the key of the associative array via descending order
+
+        // echo("After ");
+        // print_r($tiers);
+        // echo ("\n");
+
+        // echo("current quantity");
+        // print_r($qty);
+        // echo ("\n");
+
+        foreach($tiers as $tier_qty => $tier_value)
+        {
+            if($qty == 0)
+            {
+                // if there is no quantity, the price should be 0
+                return floatval(0);
+            }
+            if($qty >= intval($tier_qty))
+            {
+                // since the quantity is already sorted in descending value,
+                // we can now check if the total quantity is more than or equal to
+                // the tier value and find how much the price of each item costs
+                return floatval($tier_value);
+            }
+        }
+        //return 0.0;
     }
 
     /**
@@ -42,7 +71,54 @@ class PriceHelper
      */
     public static function getTotalPriceTierAtQty(int $qty, array $tiers): float
     {
-        return 0.0;
+        
+        // echo ("\n");
+        // echo("Price Tier: ");
+        // print_r($tiers);
+        // echo ("\n");
+
+        // echo("Quantity "); print_r($qty);
+        // echo ("\n");
+
+        $tiers_keys = array_keys($tiers); //to access the value pair in the associative array
+        ksort($tiers); //sort the key of the associative array via ascending order incase the inputs are random
+        $totalprice = 0.0;
+        
+        //print_r(sizeof($tiers));
+
+        for($i = 0; $i < sizeof($tiers); $i++)
+        {
+            $qty_range = 0.0;
+            $tier_quantity = $tiers_keys[$i];
+            $current_tier_price = $tiers[$tiers_keys[$i]];
+
+            if($i == sizeof($tiers)-1 || $qty < ($tiers_keys[$i+1] - $tier_quantity) )
+            {
+                //enter this block if there are no more tiers or the total amount quantity is lesser than the range
+                //since this is the remaining quantity is either lesser or there are no more tiers, we can use the remaining amount and multiply by the price
+                
+                $totalprice = $totalprice +  $qty*$current_tier_price;
+                return $totalprice;
+            }
+            
+            if($tier_quantity <= 0)
+            {
+                //if the tier quantity is 0 then we find the first range
+                $qty_range = $tiers_keys[$i+1] - 1;
+                //print_r($current_tier_price);
+
+                //Update the total quantity and start append it to the total price
+                $qty = $qty - $qty_range;
+                $totalprice = $totalprice + ($qty_range * floatval($current_tier_price));
+            }
+            else
+            {
+                $qty_range = $tiers_keys[$i+1] - $tier_quantity;
+                $qty = $qty - $qty_range;
+                $totalprice = $totalprice + ($qty_range * floatval($current_tier_price));
+            }
+
+        }
     }
 
     /**
@@ -61,6 +137,30 @@ class PriceHelper
      */
     public static function getPriceAtEachQty(array $qtyArr, array $tiers, bool $cumulative = false): array
     {
-       return [];
+        // echo("pricing tiers \n");
+        // print_r($tiers);
+        // echo(" \n quantity per month");
+        // print_r($qtyArr);
+        // echo(" \n");
+
+        $finalArray = [];
+
+        if($cumulative == true)
+        {
+            //calculate the $$ needed for each month's purchase
+            foreach($qtyArr as $qty)
+            {
+                $price = self::getTotalPriceTierAtQty($qty, $tiers);
+                array_push($finalArray, $price);
+                echo("\n");
+                print_r($price);
+            }
+            // print_r(sizeof($finalArray));
+            echo("\n");
+            return $finalArray;
+        }
+        
+
+        return [];
     }
 }
