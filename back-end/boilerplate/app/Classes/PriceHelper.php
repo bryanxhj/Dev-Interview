@@ -71,7 +71,6 @@ class PriceHelper
      */
     public static function getTotalPriceTierAtQty(int $qty, array $tiers): float
     {
-        
         // echo ("\n");
         // echo("Price Tier: ");
         // print_r($tiers);
@@ -83,7 +82,6 @@ class PriceHelper
         $tiers_keys = array_keys($tiers); //to access the value pair in the associative array
         ksort($tiers); //sort the key of the associative array via ascending order incase the inputs are random
         $totalprice = 0.0;
-        
         //print_r(sizeof($tiers));
 
         for($i = 0; $i < sizeof($tiers); $i++)
@@ -105,17 +103,19 @@ class PriceHelper
             {
                 //if the tier quantity is 0 then we find the first range
                 $qty_range = $tiers_keys[$i+1] - 1;
-                //print_r($current_tier_price);
 
                 //Update the total quantity and start append it to the total price
                 $qty = $qty - $qty_range;
-                $totalprice = $totalprice + ($qty_range * floatval($current_tier_price));
+                $totalprice = $totalprice + ($qty_range * self::getUnitPriceTierAtQty($qty_range, $tiers));
             }
             else
             {
+                //find out the range
                 $qty_range = $tiers_keys[$i+1] - $tier_quantity;
+
+                //Update the total quantity and start append it to the total price
                 $qty = $qty - $qty_range;
-                $totalprice = $totalprice + ($qty_range * floatval($current_tier_price));
+                $totalprice = $totalprice + ($qty_range * self::getUnitPriceTierAtQty($qty_range, $tiers));
             }
 
         }
