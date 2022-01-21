@@ -25,7 +25,31 @@ class PriceHelper
      */
     public static function getUnitPriceTierAtQty(int $qty, array $tiers): float
     {
-        return 0.0;
+        echo("Before ");
+        print_r($tiers);
+        echo ("\n");
+
+        krsort($tiers); //sort the key of the associative array via descending order
+
+        echo("After ");
+        print_r($tiers);
+        echo ("\n");
+
+        echo("current quantity");
+        print_r($qty);
+        echo ("\n");
+
+        foreach($tiers as $tier_qty => $tier_value)
+        {
+            if($qty >= intval($tier_qty))
+            {
+                // since the quantity is already sorted in descending value,
+                // we can now check if the total quantity is more than or equal to
+                // the tier value and find how much the price of each item costs
+                return floatval($tier_value);
+            }
+        }
+        //return 0.0;
     }
 
     /**
