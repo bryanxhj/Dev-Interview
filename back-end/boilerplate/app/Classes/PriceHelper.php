@@ -39,15 +39,12 @@ class PriceHelper
         // print_r($qty);
         // echo ("\n");
 
-        foreach($tiers as $tier_qty => $tier_value)
-        {
-            if($qty == 0)
-            {
+        foreach ($tiers as $tier_qty => $tier_value) {
+            if ($qty == 0) {
                 // if there is no quantity, the price should be 0
                 return floatval(0);
             }
-            if($qty >= intval($tier_qty))
-            {
+            if ($qty >= intval($tier_qty)) {
                 // since the quantity is already sorted in descending value,
                 // we can now check if the total quantity is more than or equal to
                 // the tier value and find how much the price of each item costs
@@ -84,40 +81,34 @@ class PriceHelper
         $totalprice = 0.0;
         //print_r(sizeof($tiers));
 
-        for($i = 0; $i < sizeof($tiers); $i++)
-        {
+        for ($i = 0; $i < sizeof($tiers); $i++) {
             $qty_range = 0.0;
             $tier_quantity = $tiers_keys[$i];
             $current_tier_price = $tiers[$tiers_keys[$i]];
 
-            if($i == sizeof($tiers)-1 || $qty < ($tiers_keys[$i+1] - $tier_quantity) )
-            {
+            if ($i == sizeof($tiers) - 1 || $qty < ($tiers_keys[$i + 1] - $tier_quantity)) {
                 //enter this block if there are no more tiers or the total amount quantity is lesser than the range
                 //since this is the remaining quantity is either lesser or there are no more tiers, we can use the remaining amount and multiply by the price
-                
-                $totalprice = $totalprice +  $qty*$current_tier_price;
+
+                $totalprice = $totalprice +  $qty * $current_tier_price;
                 return $totalprice;
             }
-            
-            if($tier_quantity <= 0)
-            {
+
+            if ($tier_quantity <= 0) {
                 //if the tier quantity is 0 then we find the first range
-                $qty_range = $tiers_keys[$i+1] - 1;
+                $qty_range = $tiers_keys[$i + 1] - 1;
 
                 //Update the total quantity and start append it to the total price
                 $qty = $qty - $qty_range;
                 $totalprice = $totalprice + ($qty_range * self::getUnitPriceTierAtQty($qty_range, $tiers));
-            }
-            else
-            {
+            } else {
                 //find out the range
-                $qty_range = $tiers_keys[$i+1] - $tier_quantity;
+                $qty_range = $tiers_keys[$i + 1] - $tier_quantity;
 
                 //Update the total quantity and start append it to the total price
                 $qty = $qty - $qty_range;
                 $totalprice = $totalprice + ($qty_range * self::getUnitPriceTierAtQty($qty_range, $tiers));
             }
-
         }
     }
 
@@ -137,59 +128,29 @@ class PriceHelper
      */
     public static function getPriceAtEachQty(array $qtyArr, array $tiers, bool $cumulative = false): array
     {
-        // echo("pricing tiers \n");
-        // print_r($tiers);
-        // echo(" \n quantity per month");
-        // print_r($qtyArr);
-        // echo(" \n");
-
         $finalArray = [];
-        $price = 0.0;
 
         if($cumulative == true)
         {
-            $previous_cumulative = 0;
-            //calculate the $$ needed for each month's purchase
-            for($i = 0; $i < sizeof($qtyArr); $i++)
+            $cum = 0;
+            foreach ($qtyArr as $q) 
             {
-                if($i == 0)
-                {
-                    $price = self::getTotalPriceTierAtQty($qtyArr[$i], $tiers);
-                    $previous_cumulative = $qtyArr[$i];
-                }
-                else
-                {
-                    //in progress
-                    $price = self::getTotalPriceTierAtQty(($qtyArr[$i] - $previous_cumulative), $tiers);
-                    $previous_cumulative = $previous_cumulative + $qtyArr[$i];
-                }
-
+                $price = self::getTotalPriceTierAtQty($q + $cum, $tiers) - self::getTotalPriceTierAtQty($cum, $tiers);
+                $cum += $q;
                 array_push($finalArray, $price);
-                
-                // echo("\n");
-                // print_r($price);
             }
-            // print_r(sizeof($finalArray));
-            // echo("\n");
-            return $finalArray;
-        }
-        else
+        } 
+        else 
         {
-            $price_array = [];
-            for($i = 0; $i < sizeof($qtyArr); $i++)
-            {
+            //this section onwards is for non-cumulative calculation
+            for ($i = 0; $i < sizeof($qtyArr); $i++) {
+                //get the price based on Question B's function
                 $price = self::getTotalPriceTierAtQty($qtyArr[$i], $tiers);
 
                 //push the price into the final array
                 array_push($finalArray, $price);
-                
-                echo("\n priced pushed: ");
-                print_r($price);
             }
-            return $finalArray;
         }
-        
-
-        return [];
+        return $finalArray;
     }
 }
