@@ -144,19 +144,48 @@ class PriceHelper
         // echo(" \n");
 
         $finalArray = [];
+        $price = 0.0;
 
         if($cumulative == true)
         {
+            $previous_cumulative = 0;
             //calculate the $$ needed for each month's purchase
-            foreach($qtyArr as $qty)
+            for($i = 0; $i < sizeof($qtyArr); $i++)
             {
-                $price = self::getTotalPriceTierAtQty($qty, $tiers);
+                if($i == 0)
+                {
+                    $price = self::getTotalPriceTierAtQty($qtyArr[$i], $tiers);
+                    $previous_cumulative = $qtyArr[$i];
+                }
+                else
+                {
+                    //in progress
+                    $price = self::getTotalPriceTierAtQty(($qtyArr[$i] - $previous_cumulative), $tiers);
+                    $previous_cumulative = $previous_cumulative + $qtyArr[$i];
+                }
+
                 array_push($finalArray, $price);
-                echo("\n");
-                print_r($price);
+                
+                // echo("\n");
+                // print_r($price);
             }
             // print_r(sizeof($finalArray));
-            echo("\n");
+            // echo("\n");
+            return $finalArray;
+        }
+        else
+        {
+            $price_array = [];
+            for($i = 0; $i < sizeof($qtyArr); $i++)
+            {
+                $price = self::getTotalPriceTierAtQty($qtyArr[$i], $tiers);
+
+                //push the price into the final array
+                array_push($finalArray, $price);
+                
+                echo("\n priced pushed: ");
+                print_r($price);
+            }
             return $finalArray;
         }
         
