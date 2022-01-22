@@ -25,19 +25,7 @@ class PriceHelper
      */
     public static function getUnitPriceTierAtQty(int $qty, array $tiers): float
     {
-        // echo("Before ");
-        // print_r($tiers);
-        // echo ("\n");
-
         krsort($tiers); //sort the key of the associative array via descending order
-
-        // echo("After ");
-        // print_r($tiers);
-        // echo ("\n");
-
-        // echo("current quantity");
-        // print_r($qty);
-        // echo ("\n");
 
         foreach ($tiers as $tier_qty => $tier_value) {
             if ($qty == 0) {
@@ -51,7 +39,6 @@ class PriceHelper
                 return floatval($tier_value);
             }
         }
-        //return 0.0;
     }
 
     /**
@@ -68,18 +55,9 @@ class PriceHelper
      */
     public static function getTotalPriceTierAtQty(int $qty, array $tiers): float
     {
-        // echo ("\n");
-        // echo("Price Tier: ");
-        // print_r($tiers);
-        // echo ("\n");
-
-        // echo("Quantity "); print_r($qty);
-        // echo ("\n");
-
         $tiers_keys = array_keys($tiers); //to access the value pair in the associative array
         ksort($tiers); //sort the key of the associative array via ascending order incase the inputs are random
         $totalprice = 0.0;
-        //print_r(sizeof($tiers));
 
         for ($i = 0; $i < sizeof($tiers); $i++) {
             $qty_range = 0.0;
@@ -130,18 +108,14 @@ class PriceHelper
     {
         $finalArray = [];
 
-        if($cumulative == true)
-        {
+        if ($cumulative == true) {
             $cum = 0;
-            foreach ($qtyArr as $q) 
-            {
+            foreach ($qtyArr as $q) {
                 $price = self::getTotalPriceTierAtQty($q + $cum, $tiers) - self::getTotalPriceTierAtQty($cum, $tiers);
                 $cum += $q;
                 array_push($finalArray, $price);
             }
-        } 
-        else 
-        {
+        } else {
             //this section onwards is for non-cumulative calculation
             for ($i = 0; $i < sizeof($qtyArr); $i++) {
                 //get the price based on Question B's function
