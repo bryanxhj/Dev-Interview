@@ -68,7 +68,7 @@ class PriceHelper
                 //enter this block if there are no more tiers or the total amount quantity is lesser than the range
                 //since this is the remaining quantity is either lesser or there are no more tiers, we can use the remaining amount and multiply by the price
 
-                $totalprice = $totalprice +  $qty * $current_tier_price;
+                $totalprice +=  $qty * $current_tier_price;
                 return $totalprice;
             }
 
@@ -77,15 +77,15 @@ class PriceHelper
                 $qty_range = $tiers_keys[$i + 1] - 1;
 
                 //Update the total quantity and start append it to the total price
-                $qty = $qty - $qty_range;
-                $totalprice = $totalprice + ($qty_range * self::getUnitPriceTierAtQty($qty_range, $tiers));
+                $qty -= $qty_range;
+                $totalprice += ($qty_range * self::getUnitPriceTierAtQty($qty_range, $tiers));
             } else {
                 //find out the range
                 $qty_range = $tiers_keys[$i + 1] - $tier_quantity;
 
                 //Update the total quantity and start append it to the total price
-                $qty = $qty - $qty_range;
-                $totalprice = $totalprice + ($qty_range * self::getUnitPriceTierAtQty($qty_range, $tiers));
+                $qty -= $qty_range;
+                $totalprice += ($qty_range * self::getUnitPriceTierAtQty($qty_range, $tiers));
             }
         }
     }
@@ -111,18 +111,15 @@ class PriceHelper
         if ($cumulative == true) {
             $cum = 0;
             foreach ($qtyArr as $q) {
-                $price = self::getTotalPriceTierAtQty($q + $cum, $tiers) - self::getTotalPriceTierAtQty($cum, $tiers);
+                array_push($finalArray, self::getTotalPriceTierAtQty($q + $cum, $tiers) - self::getTotalPriceTierAtQty($cum, $tiers));
                 $cum += $q;
-                array_push($finalArray, $price);
             }
         } else {
             //this section onwards is for non-cumulative calculation
             for ($i = 0; $i < sizeof($qtyArr); $i++) {
                 //get the price based on Question B's function
-                $price = self::getTotalPriceTierAtQty($qtyArr[$i], $tiers);
-
                 //push the price into the final array
-                array_push($finalArray, $price);
+                array_push($finalArray, self::getTotalPriceTierAtQty($qtyArr[$i], $tiers));
             }
         }
         return $finalArray;
